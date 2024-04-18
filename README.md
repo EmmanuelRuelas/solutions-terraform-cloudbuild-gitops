@@ -29,3 +29,30 @@ terraform plan
 terraform apply
 terraform destroy
 ```
+
+///////////////////////////////////////////////////////////////////////
+
+Compute Engine API
+
+Comandos activar las Apis de GCP
+
+    gcloud services enable cloudbuild.googleapis.com compute.googleapis.com
+
+Comandos para crear un Cloud Storage con nombre del proyecto-tfstate
+
+    PROJECT_ID=$(gcloud config get-value project)
+    gsutil mb gs://${PROJECT_ID}-tfstate
+
+Al crear este storage es necesario configurar los siguientes archivos:
+
+    terraform.tfvars y backend.tf
+
+En Cloud Shell, recupera el correo electrónico de la cuenta de servicio de Cloud Build de tu proyecto:
+
+    CLOUDBUILD_SA="$(gcloud projects describe $PROJECT_ID \
+        --format 'value(projectNumber)')@cloudbuild.gserviceaccount.com"
+
+Otorga el acceso requerido a tu cuenta de servicio de Cloud Build:
+
+    gcloud projects add-iam-policy-binding $PROJECT_ID \
+        --member serviceAccount:$CLOUDBUILD_SA --role roles/editor
